@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Novanet - Login</title>
+    <style>
+        /* CSS Styles */
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #000000, #000000);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #ffffff;
+            animation: backgroundAnimation 10s infinite alternate;
+        }
+
+        @keyframes backgroundAnimation {
+            0% { background: linear-gradient(135deg, #2065ffe6, black); }
+            100% { background: linear-gradient(135deg, #2065ffe6, black); }
+        }
+
+        .container {
+            background: rgba(0, 0, 0, 0.7);
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+            width: 100%;
+            max-width: 400px;
+            animation: fadeIn 2s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        header h1 {
+            font-size: 2em;
+            letter-spacing: 2px;
+            animation: slideIn 1s ease-out;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-50px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+
+        input[type="email"],
+        input[type="password"] {
+            padding: 15px;
+            margin: 10px 0;
+            border: none;
+            border-radius: 5px;
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            font-size: 1em;
+            transition: background 0.3s;
+        }
+
+        input[type="email"]:focus,
+        input[type="password"]:focus {
+            background: rgba(255, 255, 255, 0.2);
+            outline: none;
+        }
+
+        .checkbox-container {
+            display: flex;
+            align-items: center;
+            margin: 10px 0;
+        }
+
+        .checkbox-container input {
+            margin-right: 10px;
+        }
+
+        button {
+            padding: 15px;
+            margin: 20px 0;
+            border: none;
+            border-radius: 5px;
+            background-color: #ff7e5f;
+            color: #fff;
+            font-size: 1em;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #feb47b;
+        }
+
+        .switch-auth {
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        .switch-auth a {
+            color: #ffddc1;
+            text-decoration: none;
+            font-weight: bold;
+            transition: color 0.3s;
+        }
+
+        .switch-auth a:hover {
+            color: #fff;
+        }
+
+        .error-message {
+            color: #ff4b5c;
+            text-align: center;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Novanet</h1>
+        </header>
+        <form id="login-form">
+            <input type="email" id="email" placeholder="Email" required>
+            <input type="password" id="password" placeholder="Password" required>
+            <div class="checkbox-container">
+                <input type="checkbox" id="rememberMe">
+                <label for="rememberMe">Remember Me</label>
+            </div>
+            <button type="submit">Login</button>
+        </form>
+        <div class="switch-auth">
+            <p>Don't have an account? <a href="new.html">Create Account</a></p>
+        </div>
+        <div class="error-message" id="error-message"></div>
+    </div>
+
+    <!-- Firebase and JavaScript -->
+    <script type="module">
+        // Firebase Configuration
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-analytics.js";
+        import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
+        import { getDatabase, ref as dbRef, get, child } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBpbiMG_gBbo-0m1xKZh7WE9ZF4pXStFfw",
+            authDomain: "chat-c54f3.firebaseapp.com",
+            databaseURL: "https://chat-c54f3-default-rtdb.firebaseio.com",
+            projectId: "chat-c54f3",
+            storageBucket: "chat-c54f3.appspot.com",
+            messagingSenderId: "1004273890014",
+            appId: "1:1004273890014:web:ca091332da320dced7484f",
+            measurementId: "G-H6XR4BXG73"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+        const auth = getAuth(app);
+        const database = getDatabase(app);
+
+        // Login Form Handling
+        const loginForm = document.getElementById('login-form');
+        const errorMessage = document.getElementById('error-message');
+
+        loginForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value.trim();
+            const rememberMe = document.getElementById('rememberMe').checked;
+
+            if (email === "" || password === "") {
+                errorMessage.textContent = "Please fill in all fields.";
+                return;
+            }
+
+            signInWithEmailAndPassword(auth, email, password)
+                .then((userCredential) => {
+                    // Logged in successfully
+                    if (rememberMe) {
+                        const userData = {
+                            email: email,
+                            password: password
+                        };
+                        localStorage.setItem('user', JSON.stringify(userData));
+                    } else {
+                        // Remove any existing user data in localStorage
+                        localStorage.removeItem('user');
+                    }
+                    // Redirect to loading page with parameter indicating login
+                    window.location.href = 'down.html?from=login';
+                })
+                .catch((error) => {
+                    errorMessage.textContent = error.message;
+                });
+        });
+
+        // On page load, check if user data is in localStorage
+        window.addEventListener('load', () => {
+            const storedUser = localStorage.getItem('user');
+            if (storedUser) {
+                const { email, password } = JSON.parse(storedUser);
+                document.getElementById('email').value = email;
+                document.getElementById('password').value = password;
+                document.getElementById('rememberMe').checked = true;
+            }
+        });
+    </script>
+</body>
+</html>
