@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Novanet - Profile Picture</title>
+    <style>
+        /* CSS Styles */
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #ffffff;
+            animation: backgroundAnimation 10s infinite alternate;
+        }
+
+        @keyframes backgroundAnimation {
+            0% { background: linear-gradient(135deg, #2065ffe6, black); }
+            100% { background: linear-gradient(135deg, #2065ffe6, black); }
+        }
+
+        .container {
+            background: rgba(0, 0, 0, 0.7);
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+            width: 100%;
+            max-width: 500px;
+            animation: fadeIn 2s ease-in-out;
+            text-align: center;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        header {
+            position: absolute;
+            top: 20px;
+            left: 40px;
+        }
+
+        header h1 {
+            font-size: 2em;
+            letter-spacing: 2px;
+            animation: slideIn 1s ease-out;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-50px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        h2 {
+            margin-bottom: 20px;
+            animation: fadeIn 1.5s ease-in-out;
+        }
+
+        input[type="file"] {
+            padding: 10px;
+            margin: 10px 0;
+            border: none;
+            border-radius: 5px;
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            font-size: 1em;
+            transition: background 0.3s;
+            width: 100%;
+        }
+
+        input[type="file"]:focus {
+            background: rgba(255, 255, 255, 0.2);
+            outline: none;
+        }
+
+        button {
+            padding: 15px;
+            margin: 20px 10px 0 10px;
+            border: none;
+            border-radius: 5px;
+            background-color: #ff7e5f;
+            color: #fff;
+            font-size: 1em;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            width: calc(50% - 20px);
+        }
+
+        button:hover {
+            background-color: #feb47b;
+        }
+
+        .buttons {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .error-message {
+            color: #ff4b5c;
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        .success-message {
+            color: #4caf50;
+            text-align: center;
+            margin-top: 10px;
+        }
+
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Novanet</h1>
+    </header>
+
+    <div class="container">
+        <h2>Set Your Profile Picture</h2>
+        <input type="file" id="profilePic" accept="image/*">
+        <div class="buttons">
+            <button id="uploadBtn">Upload</button>
+            <button id="skipBtn">Skip</button>
+        </div>
+        <div class="error-message" id="error-message"></div>
+        <div class="success-message" id="success-message"></div>
+    </div>
+
+    <!-- Firebase and JavaScript -->
+    <script type="module">
+        // Firebase Configuration
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-analytics.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
+        import { getDatabase, ref as dbRef, set, get } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js";
+        import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-storage.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBpbiMG_gBbo-0m1xKZh7WE9ZF4pXStFfw",
+            authDomain: "chat-c54f3.firebaseapp.com",
+            databaseURL: "https://chat-c54f3-default-rtdb.firebaseio.com",
+            projectId: "chat-c54f3",
+            storageBucket: "chat-c54f3.appspot.com",
+            messagingSenderId: "1004273890014",
+            appId: "1:1004273890014:web:ca091332da320dced7484f",
+            measurementId: "G-H6XR4BXG73"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+        const auth = getAuth(app);
+        const database = getDatabase(app);
+        const storage = getStorage(app);
+
+        // Elements
+        const uploadBtn = document.getElementById('uploadBtn');
+        const skipBtn = document.getElementById('skipBtn');
+        const profilePicInput = document.getElementById('profilePic');
+        const errorMessage = document.getElementById('error-message');
+        const successMessage = document.getElementById('success-message');
+
+        // Default Profile Picture URL
+        const defaultPic = 'https://via.placeholder.com/150';
+
+        // Check Authentication State
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                // User is signed in, proceed
+                console.log('User is signed in:', user.email);
+            } else {
+                // No user is signed in, redirect to login
+                window.location.href = 'login.html';
+            }
+        });
+
+        // Upload Button Click Handler
+        uploadBtn.addEventListener('click', () => {
+            const file = profilePicInput.files[0];
+            if (file) {
+                const user = auth.currentUser;
+                if (!user) {
+                    errorMessage.textContent = "User not authenticated.";
+                    return;
+                }
+
+                const picRef = storageRef(storage, `profilePics/${user.uid}/${file.name}`);
+                uploadBytes(picRef, file)
+                    .then((snapshot) => {
+                        return getDownloadURL(snapshot.ref);
+                    })
+                    .then((downloadURL) => {
+                        // Save URL to database
+                        return set(dbRef(database, 'users/' + user.uid + '/profilePic'), downloadURL);
+                    })
+                    .then(() => {
+                        successMessage.textContent = "Profile picture uploaded successfully!";
+                        // Redirect after a short delay to show success message
+                        setTimeout(() => {
+                            window.location.href = 'home.html';
+                        }, 1500);
+                    })
+                    .catch((error) => {
+                        errorMessage.textContent = error.message;
+                    });
+            } else {
+                errorMessage.textContent = 'Please select a file to upload.';
+            }
+        });
+
+        // Skip Button Click Handler
+        skipBtn.addEventListener('click', () => {
+            const user = auth.currentUser;
+            if (!user) {
+                errorMessage.textContent = "User not authenticated.";
+                return;
+            }
+
+            // Set default profile picture
+            set(dbRef(database, 'users/' + user.uid + '/profilePic'), defaultPic)
+                .then(() => {
+                    successMessage.textContent = "Default profile picture set.";
+                    // Redirect after a short delay to show success message
+                    setTimeout(() => {
+                        window.location.href = 'home.html';
+                    }, 1500);
+                })
+                .catch((error) => {
+                    errorMessage.textContent = error.message;
+                });
+        });
+    </script>
+</body>
+</html>

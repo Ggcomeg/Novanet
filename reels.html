@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Novanet - Reels</title>
+    <style>
+        /* CSS Styles */
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: #000;
+            color: #fff;
+            overflow: hidden;
+        }
+
+        .reel-container {
+            width: 100%;
+            height: 100vh;
+            position: relative;
+        }
+
+        .reel {
+            width: 100%;
+            height: 100vh;
+            position: absolute;
+            top: 0;
+            left: 0;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            background: #000;
+        }
+
+        .reel.active {
+            display: flex;
+        }
+
+        video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .navbar {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            display: flex;
+            align-items: center;
+            z-index: 10;
+        }
+
+        .navbar h1 {
+            margin-right: 20px;
+            font-size: 1.5em;
+            color: #fff;
+        }
+
+        .profile-pic {
+            height: 40px;
+            width: 40px;
+            border-radius: 50%;
+            border: 2px solid #fff;
+            object-fit: cover;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+
+        .profile-pic:hover {
+            transform: scale(1.1);
+        }
+
+        /* Indicator Dots */
+        .indicators {
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            z-index: 10;
+        }
+
+        .indicator {
+            width: 10px;
+            height: 10px;
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 50%;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .indicator.active {
+            background: #fff;
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <h1>Novanet</h1>
+        <img src="https://via.placeholder.com/40" alt="Profile" class="profile-pic" id="profilePic">
+    </div>
+
+    <div class="indicators" id="indicators">
+        <!-- Indicators will be dynamically added here -->
+    </div>
+
+    <div class="reel-container" id="reelContainer">
+        <!-- Reels will be dynamically added here -->
+    </div>
+
+    <!-- Firebase and JavaScript -->
+    <script type="module">
+        // Firebase Configuration
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-analytics.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
+        import { getDatabase, ref as dbRef, get, child, onValue } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBpbiMG_gBbo-0m1xKZh7WE9ZF4pXStFfw",
+            authDomain: "chat-c54f3.firebaseapp.com",
+            databaseURL: "https://chat-c54f3-default-rtdb.firebaseio.com",
+            projectId: "chat-c54f3",
+            storageBucket: "chat-c54f3.appspot.com",
+            messagingSenderId: "1004273890014",
+            appId: "1:1004273890014:web:ca091332da320dced7484f",
+            measurementId: "G-H6XR4BXG73"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+        const auth = getAuth(app);
+        const database = getDatabase(app);
+
+        // Elements
+        const profilePic = document.getElementById('profilePic');
+        const reelContainer = document.getElementById('reelContainer');
+        const indicators = document.getElementById('indicators');
+
+        let reels = [];
+        let currentReelIndex = 0;
+
+        // Check Authentication State
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                // User is signed in, fetch profile picture
+                const userRef = dbRef(database, 'users/' + user.uid + '/profilePic');
+                get(userRef).then((snapshot) => {
+                    if (snapshot.exists()) {
+                        profilePic.src = snapshot.val();
+                    } else {
+                        profilePic.src = 'https://via.placeholder.com/40';
+                    }
+                }).catch((error) => {
+                    console.error("Error fetching profile picture:", error);
+                    profilePic.src = 'https://via.placeholder.com/40';
+                });
+
+                // Fetch video posts
+                const postsRef = dbRef(database, 'posts');
+                onValue(postsRef, (snapshot) => {
+                    const posts = snapshot.val();
+                    reels = [];
+                    if (posts) {
+                        Object.keys(posts).forEach(postId => {
+                            const post = posts[postId];
+                            if (post.reels) {
+                                reels.push(post.reels);
+                            }
+                        });
+                    }
+                    displayReels();
+                });
+
+            } else {
+                // No user is signed in, redirect to login
+                window.location.href = 'login.html';
+            }
+        });
+
+        // Function to display reels
+        function displayReels() {
+            reelContainer.innerHTML = '';
+            indicators.innerHTML = '';
+
+            if (reels.length === 0) {
+                reelContainer.innerHTML = '<p style="color: #fff;">No reels available.</p>';
+                return;
+            }
+
+            reels.forEach((videoURL, index) => {
+                // Create reel div
+                const reel = document.createElement('div');
+                reel.classList.add('reel');
+                if (index === 0) reel.classList.add('active');
+
+                // Create video element
+                const video = document.createElement('video');
+                video.src = videoURL;
+                video.controls = false;
+                video.autoplay = true;
+                video.loop = true;
+
+                reel.appendChild(video);
+                reelContainer.appendChild(reel);
+
+                // Create indicator
+                const indicator = document.createElement('div');
+                indicator.classList.add('indicator');
+                if (index === 0) indicator.classList.add('active');
+                indicator.dataset.index = index;
+                indicators.appendChild(indicator);
+            });
+
+            currentReelIndex = 0;
+        }
+
+        // Handle swipe gestures
+        let touchStartY = 0;
+        let touchEndY = 0;
+
+        reelContainer.addEventListener('touchstart', (e) => {
+            touchStartY = e.changedTouches[0].screenY;
+        }, false);
+
+        reelContainer.addEventListener('touchend', (e) => {
+            touchEndY = e.changedTouches[0].screenY;
+            handleGesture();
+        }, false);
+
+        function handleGesture() {
+            if (touchEndY < touchStartY - 50) {
+                // Swipe Up
+                nextReel();
+            }
+            if (touchEndY > touchStartY + 50) {
+                // Swipe Down
+                previousReel();
+            }
+        }
+
+        function nextReel() {
+            if (currentReelIndex < reels.length - 1) {
+                switchReel(currentReelIndex + 1);
+            }
+        }
+
+        function previousReel() {
+            if (currentReelIndex > 0) {
+                switchReel(currentReelIndex - 1);
+            }
+        }
+
+        function switchReel(index) {
+            const reelsElements = document.querySelectorAll('.reel');
+            const indicatorsElements = document.querySelectorAll('.indicator');
+
+            reelsElements[currentReelIndex].classList.remove('active');
+            indicatorsElements[currentReelIndex].classList.remove('active');
+
+            reelsElements[index].classList.add('active');
+            indicatorsElements[index].classList.add('active');
+
+            currentReelIndex = index;
+        }
+
+        // Handle indicator clicks
+        indicators.addEventListener('click', (e) => {
+            if (e.target.classList.contains('indicator')) {
+                const index = parseInt(e.target.dataset.index);
+                switchReel(index);
+            }
+        });
+    </script>
+</body>
+</html>

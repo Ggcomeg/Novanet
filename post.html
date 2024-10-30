@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Novanet - Add Post</title>
+    <style>
+        /* CSS Styles */
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            color: #ffffff;
+            animation: backgroundAnimation 10s infinite alternate;
+        }
+
+        @keyframes backgroundAnimation {
+            0% { background: linear-gradient(135deg, #2065ffe6, black); }
+            100% { background: linear-gradient(135deg, #2065ffe6, black); }
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 40px;
+            background: rgba(0, 0, 0, 0.5);
+            position: relative;
+        }
+
+        header h1 {
+            font-size: 2em;
+            letter-spacing: 2px;
+            animation: slideIn 1s ease-out;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-50px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .profile-pic {
+            height: 50px;
+            width: 50px;
+            border-radius: 50%;
+            border: 2px solid #ffffff;
+            object-fit: cover;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+
+        .profile-pic:hover {
+            transform: scale(1.1);
+        }
+
+        .navbar {
+            display: flex;
+            justify-content: center;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 10px 0;
+            animation: fadeIn 1.5s ease-in-out;
+        }
+
+        .navbar a {
+            color: #ffffff;
+            text-decoration: none;
+            padding: 10px 20px;
+            margin: 0 10px;
+            font-size: 1.1em;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .navbar a:hover {
+            background-color: #333333;
+            border-radius: 5px;
+        }
+
+        .navbar a.active {
+            background-color: #ff7e5f;
+            border-radius: 5px;
+        }
+
+        .container {
+            flex: 1;
+            padding: 20px 40px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .form-container {
+            background: rgba(0, 0, 0, 0.7);
+            padding: 30px;
+            border-radius: 10px;
+            width: 100%;
+            max-width: 600px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+            animation: fadeIn 2s ease-in-out;
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            animation: fadeInDown 1s ease-out;
+        }
+
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        textarea {
+            width: 100%;
+            padding: 15px;
+            margin: 10px 0;
+            border: none;
+            border-radius: 5px;
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            font-size: 1em;
+            resize: vertical;
+            min-height: 100px;
+            transition: background 0.3s;
+        }
+
+        textarea:focus {
+            background: rgba(255, 255, 255, 0.2);
+            outline: none;
+        }
+
+        .media-options {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            margin: 10px 0;
+        }
+
+        .media-options button {
+            flex: 1;
+            padding: 10px 0;
+            margin: 0 5px;
+            border: none;
+            border-radius: 5px;
+            background-color: #3f51b5;
+            color: #fff;
+            font-size: 1em;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .media-options button:hover {
+            background-color: #303f9f;
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 15px;
+            margin-top: 20px;
+            border: none;
+            border-radius: 5px;
+            background-color: #ff7e5f;
+            color: #fff;
+            font-size: 1.2em;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .submit-btn:hover {
+            background-color: #feb47b;
+        }
+
+        .error-message {
+            color: #ff4b5c;
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        .success-message {
+            color: #4caf50;
+            text-align: center;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Novanet</h1>
+        <img src="https://via.placeholder.com/50" alt="Profile" class="profile-pic" id="profilePic">
+    </header>
+
+    <div class="navbar">
+        <a href="home.html" class="active">Home</a>
+        <a href="posts.html">Posts</a>
+    </div>
+
+    <div class="container">
+        <div class="form-container">
+            <h2>Add Your Post</h2>
+            <form id="post-form">
+                <textarea id="postText" placeholder="Add your text here..." required></textarea>
+
+                <div class="media-options">
+                    <button type="button" id="addImageBtn">Add Images</button>
+                    <button type="button" id="addVideoBtn">Add Video</button>
+                </div>
+
+                <input type="file" id="mediaInput" accept="image/*,video/*" multiple>
+
+                <button type="submit" class="submit-btn">Post</button>
+            </form>
+            <div class="error-message" id="error-message"></div>
+            <div class="success-message" id="success-message"></div>
+        </div>
+    </div>
+
+    <!-- Firebase and JavaScript -->
+    <script type="module">
+        // Firebase Configuration
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-analytics.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
+        import { getDatabase, ref as dbRef, push, set } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js";
+        import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-storage.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBpbiMG_gBbo-0m1xKZh7WE9ZF4pXStFfw",
+            authDomain: "chat-c54f3.firebaseapp.com",
+            databaseURL: "https://chat-c54f3-default-rtdb.firebaseio.com",
+            projectId: "chat-c54f3",
+            storageBucket: "chat-c54f3.appspot.com",
+            messagingSenderId: "1004273890014",
+            appId: "1:1004273890014:web:ca091332da320dced7484f",
+            measurementId: "G-H6XR4BXG73"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+        const auth = getAuth(app);
+        const database = getDatabase(app);
+        const storage = getStorage(app);
+
+        // Elements
+        const profilePic = document.getElementById('profilePic');
+        const addImageBtn = document.getElementById('addImageBtn');
+        const addVideoBtn = document.getElementById('addVideoBtn');
+        const mediaInput = document.getElementById('mediaInput');
+        const postForm = document.getElementById('post-form');
+        const errorMessage = document.getElementById('error-message');
+        const successMessage = document.getElementById('success-message');
+
+        // Check Authentication State
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                // User is signed in, fetch profile picture
+                const userRef = dbRef(database, 'users/' + user.uid + '/profilePic');
+                fetch(userRef).then((snapshot) => {
+                    if (snapshot.exists()) {
+                        profilePic.src = snapshot.val();
+                    } else {
+                        profilePic.src = 'https://via.placeholder.com/50';
+                    }
+                }).catch((error) => {
+                    console.error("Error fetching profile picture:", error);
+                    profilePic.src = 'https://via.placeholder.com/50';
+                });
+            } else {
+                // No user is signed in, redirect to login
+                window.location.href = 'login.html';
+            }
+        });
+
+        // Add Image Button Click Handler
+        addImageBtn.addEventListener('click', () => {
+            mediaInput.accept = 'image/*';
+            mediaInput.multiple = true;
+            mediaInput.click();
+        });
+
+        // Add Video Button Click Handler
+        addVideoBtn.addEventListener('click', () => {
+            mediaInput.accept = 'video/*';
+            mediaInput.multiple = false;
+            mediaInput.click();
+        });
+
+        // Post Form Submit Handler
+        postForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            errorMessage.textContent = '';
+            successMessage.textContent = '';
+
+            const text = document.getElementById('postText').value.trim();
+            const files = mediaInput.files;
+            const user = auth.currentUser;
+
+            if (!user) {
+                errorMessage.textContent = 'User not authenticated.';
+                return;
+            }
+
+            if (text === '' && files.length === 0) {
+                errorMessage.textContent = 'Please add some text or media.';
+                return;
+            }
+
+            try {
+                // Create a new post reference
+                const postsRef = dbRef(database, 'posts');
+                const newPostRef = push(postsRef);
+                const postId = newPostRef.key;
+
+                // Initialize post data
+                const postData = {
+                    userId: user.uid,
+                    text: text,
+                    timestamp: Date.now()
+                };
+
+                // Handle media uploads
+                if (files.length > 0) {
+                    const file = files[0];
+
+                    if (file.type.startsWith('image/')) {
+                        // Upload images
+                        const imageUrls = [];
+                        for (let i = 0; i < files.length; i++) {
+                            const image = files[i];
+                            const imgRef = storageRef(storage, `posts/${user.uid}/images/${postId}/${image.name}`);
+                            const snapshot = await uploadBytes(imgRef, image);
+                            const downloadURL = await getDownloadURL(snapshot.ref);
+                            imageUrls.push(downloadURL);
+                        }
+                        postData.pictures = imageUrls;
+                    } else if (file.type.startsWith('video/')) {
+                        // Upload video
+                        const videoRef = storageRef(storage, `posts/${user.uid}/videos/${postId}/${file.name}`);
+                        const snapshot = await uploadBytes(videoRef, file);
+                        const downloadURL = await getDownloadURL(snapshot.ref);
+                        postData.reels = downloadURL;
+                    }
+                }
+
+                // Save post data to database
+                await set(newPostRef, postData);
+
+                successMessage.textContent = 'Post added successfully!';
+                postForm.reset();
+                // Optionally, redirect to home after a short delay
+                setTimeout(() => {
+                    window.location.href = 'home.html';
+                }, 1500);
+
+            } catch (error) {
+                console.error("Error adding post:", error);
+                errorMessage.textContent = error.message;
+            }
+        });
+    </script>
+</body>
+</html>

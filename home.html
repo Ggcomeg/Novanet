@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Novanet - Home</title>
+    <style>
+        /* CSS Styles */
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            color: #ffffff;
+            animation: backgroundAnimation 10s infinite alternate;
+        }
+
+        @keyframes backgroundAnimation {
+            0% { background: linear-gradient(135deg, #2065ffe6, black); }
+            100% { background: linear-gradient(135deg, #2065ffe6, black); } 
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 40px;
+            background: rgba(0, 0, 0, 0.5);
+            position: relative;
+        }
+
+        header h1 {
+            font-size: 2em;
+            letter-spacing: 2px;
+            animation: slideIn 1s ease-out;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-50px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .profile-pic {
+            height: 50px;
+            width: 50px;
+            border-radius: 50%;
+            border: 2px solid #ffffff;
+            object-fit: cover;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+
+        .profile-pic:hover {
+            transform: scale(1.1);
+        }
+
+        .navbar {
+            display: flex;
+            justify-content: center;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 10px 0;
+            animation: fadeIn 1.5s ease-in-out;
+        }
+
+        .navbar a {
+            color: #ffffff;
+            text-decoration: none;
+            padding: 10px 20px;
+            margin: 0 10px;
+            font-size: 1.1em;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .navbar a:hover {
+            background-color: #333333;
+            border-radius: 5px;
+        }
+
+        .navbar a.active {
+            background-color: #ff7e5f;
+            border-radius: 5px;
+        }
+
+        .container {
+            flex: 1;
+            padding: 20px 40px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .add-post-btn {
+            padding: 15px 30px;
+            background-color: #ff7e5f;
+            border: none;
+            border-radius: 5px;
+            color: #fff;
+            font-size: 1.2em;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.3s;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            margin-bottom: 20px;
+        }
+
+        .add-post-btn:hover {
+            background-color: #feb47b;
+            transform: scale(1.05);
+        }
+
+        /* Styling for Posts */
+        .posts-container {
+            width: 100%;
+            max-width: 800px;
+        }
+
+        .post {
+            background: rgba(0, 0, 0, 0.6);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            animation: fadeInUp 0.5s ease-out;
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .post-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .post-header img {
+            height: 40px;
+            width: 40px;
+            border-radius: 50%;
+            margin-right: 10px;
+            object-fit: cover;
+        }
+
+        .post-header .username {
+            font-weight: bold;
+            margin-right: auto;
+        }
+
+        .post-timestamp {
+            font-size: 0.8em;
+            color: #cccccc;
+        }
+
+        .post-content {
+            margin-bottom: 10px;
+            white-space: pre-wrap;
+        }
+
+        .post-media img, .post-media video {
+            max-width: 100%;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+
+        .post-actions {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-top: 10px;
+        }
+
+        .post-actions button {
+            background: none;
+            border: none;
+            color: #ffffff;
+            cursor: pointer;
+            font-size: 1em;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            transition: color 0.3s;
+        }
+
+        .post-actions button:hover {
+            color: #ff7e5f;
+        }
+
+        .comments-section {
+            margin-top: 15px;
+            border-top: 1px solid #555555;
+            padding-top: 10px;
+        }
+
+        .comments-section h4 {
+            margin-bottom: 10px;
+        }
+
+        .comment {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .comment img {
+            height: 30px;
+            width: 30px;
+            border-radius: 50%;
+            margin-right: 10px;
+            object-fit: cover;
+        }
+
+        .comment-text {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 8px 12px;
+            border-radius: 5px;
+            flex: 1;
+        }
+
+        .add-comment {
+            display: flex;
+            align-items: center;
+            margin-top: 10px;
+        }
+
+        .add-comment input {
+            flex: 1;
+            padding: 8px 12px;
+            border: none;
+            border-radius: 5px;
+            background: rgba(255, 255, 255, 0.1);
+            color: #ffffff;
+            margin-right: 10px;
+        }
+
+        .add-comment button {
+            padding: 8px 12px;
+            border: none;
+            border-radius: 5px;
+            background-color: #ff7e5f;
+            color: #fff;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .add-comment button:hover {
+            background-color: #feb47b;
+        }
+
+        /* Follow Button */
+        .follow-btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 5px;
+            background-color: #3f51b5;
+            color: #fff;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .follow-btn.following {
+            background-color: #ff4b5c;
+        }
+
+        .follow-btn:hover {
+            background-color: #303f9f;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            header {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .profile-pic {
+                position: absolute;
+                top: 20px;
+                right: 40px;
+            }
+
+            .navbar {
+                flex-direction: column;
+            }
+
+            .navbar a {
+                margin: 5px 0;
+            }
+
+            .container {
+                padding: 20px;
+            }
+
+            .posts-container {
+                width: 100%;
+                padding: 0 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Novanet</h1>
+        <img src="https://via.placeholder.com/50" alt="Profile" class="profile-pic" id="profilePic">
+    </header>
+
+    <div class="navbar">
+        <a href="home.html" class="active">Home</a>
+        <a href="reels.html">reels</a>
+    </div>
+
+    <div class="container">
+        <button class="add-post-btn" id="addPostBtn">Add Your Post!!</button>
+        <div class="posts-container" id="postsContainer">
+            <!-- المنشورات ستظهر هنا -->
+        </div>
+    </div>
+
+    <!-- Firebase and JavaScript -->
+    <script type="module">
+        // Firebase Configuration
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-analytics.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
+        import { getDatabase, ref as dbRef, onValue, set, update, push } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBpbiMG_gBbo-0m1xKZh7WE9ZF4pXStFfw",
+            authDomain: "chat-c54f3.firebaseapp.com",
+            databaseURL: "https://chat-c54f3-default-rtdb.firebaseio.com",
+            projectId: "chat-c54f3",
+            storageBucket: "chat-c54f3.appspot.com",
+            messagingSenderId: "1004273890014",
+            appId: "1:1004273890014:web:ca091332da320dced7484f",
+            measurementId: "G-H6XR4BXG73"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+        const auth = getAuth(app);
+        const database = getDatabase(app);
+
+        // Elements
+        const profilePic = document.getElementById('profilePic');
+        const addPostBtn = document.getElementById('addPostBtn');
+        const postsContainer = document.getElementById('postsContainer');
+
+        // Default Profile Picture
+        const defaultPic = 'https://via.placeholder.com/50';
+
+        // Check Authentication State
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                // User is signed in, fetch profile picture and username
+                const userRef = dbRef(database, 'users/' + user.uid);
+                onValue(userRef, (snapshot) => {
+                    if (snapshot.exists()) {
+                        const userData = snapshot.val();
+                        profilePic.src = userData.profilePic || defaultPic;
+                        window.currentUser = {
+                            uid: user.uid,
+                            username: userData.username,
+                            profilePic: userData.profilePic || defaultPic
+                        };
+                    } else {
+                        profilePic.src = defaultPic;
+                        window.currentUser = {
+                            uid: user.uid,
+                            username: 'Unknown',
+                            profilePic: defaultPic
+                        };
+                    }
+                });
+
+                // Fetch and display posts
+                const postsRef = dbRef(database, 'posts');
+                onValue(postsRef, (snapshot) => {
+                    const posts = snapshot.val();
+                    displayPosts(posts);
+                });
+
+            } else {
+                // No user is signed in, check localStorage
+                const storedUser = localStorage.getItem('user') || sessionStorage.getItem('user');
+                if (storedUser) {
+                    const userData = JSON.parse(storedUser);
+                    // Sign in the user silently if possible (requires additional setup)
+                    // For simplicity, redirect to login
+                    window.location.href = 'login.html';
+                } else {
+                    // Redirect to login
+                    window.location.href = 'login.html';
+                }
+            }
+        });
+
+        // Add Post Button Click Handler
+        addPostBtn.addEventListener('click', () => {
+            window.location.href = 'post.html';
+        });
+
+        // Function to display posts
+        function displayPosts(posts) {
+            postsContainer.innerHTML = ''; // Clear existing posts
+
+            if (!posts) {
+                postsContainer.innerHTML = '<p>No posts available.</p>';
+                return;
+            }
+
+            // Convert posts object to an array and sort by timestamp descending
+            const postsArray = Object.keys(posts).map(key => ({ id: key, ...posts[key] }));
+            postsArray.sort((a, b) => b.timestamp - a.timestamp);
+
+            postsArray.forEach(post => {
+                const postElement = document.createElement('div');
+                postElement.classList.add('post');
+
+                // Post Header
+                const postHeader = document.createElement('div');
+                postHeader.classList.add('post-header');
+
+                const postProfilePic = document.createElement('img');
+                postProfilePic.src = defaultPic; // Default, will update below
+                postProfilePic.alt = "Profile";
+
+                const username = document.createElement('span');
+                username.classList.add('username');
+                username.textContent = "User"; // Placeholder, will update below
+
+                const postTimestamp = document.createElement('div');
+                postTimestamp.classList.add('post-timestamp');
+                const date = new Date(post.timestamp);
+                postTimestamp.textContent = date.toLocaleString();
+
+                postHeader.appendChild(postProfilePic);
+                postHeader.appendChild(username);
+                postHeader.appendChild(postTimestamp);
+
+                // Post Content
+                const postContent = document.createElement('div');
+                postContent.classList.add('post-content');
+                postContent.textContent = post.text || '';
+
+                // Post Media
+                const postMedia = document.createElement('div');
+                postMedia.classList.add('post-media');
+
+                if (post.pictures) {
+                    post.pictures.forEach(picUrl => {
+                        const img = document.createElement('img');
+                        img.src = picUrl;
+                        img.alt = "Post Image";
+                        postMedia.appendChild(img);
+                    });
+                }
+
+                if (post.reels) {
+                    const video = document.createElement('video');
+                    video.src = post.reels;
+                    video.controls = true;
+                    postMedia.appendChild(video);
+                }
+
+                // Post Actions (Like, Follow, Comment)
+                const postActions = document.createElement('div');
+                postActions.classList.add('post-actions');
+
+                // Like Button
+                const likeBtn = document.createElement('button');
+                likeBtn.innerHTML = `&#128077; <span id="like-count-${post.id}">0</span>`;
+                likeBtn.addEventListener('click', () => handleLike(post.id));
+                postActions.appendChild(likeBtn);
+
+                // Follow Button
+                const followBtn = document.createElement('button');
+                followBtn.textContent = 'Follow';
+                followBtn.classList.add('follow-btn');
+                followBtn.addEventListener('click', () => handleFollow(post.userId, followBtn));
+                postActions.appendChild(followBtn);
+
+                // Comment Button
+                const commentBtn = document.createElement('button');
+                commentBtn.innerHTML = `&#128172;`;
+                commentBtn.addEventListener('click', () => toggleComments(post.id));
+                postActions.appendChild(commentBtn);
+
+                // Assemble Post
+                postElement.appendChild(postHeader);
+                postElement.appendChild(postContent);
+                postElement.appendChild(postMedia);
+                postElement.appendChild(postActions);
+
+                // Comments Section
+                const commentsSection = document.createElement('div');
+                commentsSection.classList.add('comments-section');
+                commentsSection.id = `comments-${post.id}`;
+                commentsSection.style.display = 'none'; // Hidden by default
+
+                const commentsHeader = document.createElement('h4');
+                commentsHeader.textContent = 'Comments';
+                commentsSection.appendChild(commentsHeader);
+
+                // Existing Comments
+                const commentsList = document.createElement('div');
+                commentsList.id = `comments-list-${post.id}`;
+                commentsSection.appendChild(commentsList);
+
+                // Add Comment Form
+                const addCommentDiv = document.createElement('div');
+                addCommentDiv.classList.add('add-comment');
+
+                const commentInput = document.createElement('input');
+                commentInput.type = 'text';
+                commentInput.placeholder = 'Add a comment...';
+                addCommentDiv.appendChild(commentInput);
+
+                const commentButton = document.createElement('button');
+                commentButton.textContent = 'Post';
+                commentButton.addEventListener('click', () => handleComment(post.id, commentInput.value));
+                addCommentDiv.appendChild(commentButton);
+
+                commentsSection.appendChild(addCommentDiv);
+
+                postElement.appendChild(commentsSection);
+
+                // Append post to container
+                postsContainer.appendChild(postElement);
+
+                // Fetch user data for the post
+                const userRef = dbRef(database, 'users/' + post.userId);
+                onValue(userRef, (snapshot) => {
+                    if (snapshot.exists()) {
+                        const userData = snapshot.val();
+                        username.textContent = userData.username || 'Unknown';
+                        postProfilePic.src = userData.profilePic || defaultPic;
+                    } else {
+                        username.textContent = 'Unknown';
+                        postProfilePic.src = defaultPic;
+                    }
+                });
+
+                // Initialize like count
+                const likeCountRef = dbRef(database, 'likes/' + post.id);
+                onValue(likeCountRef, (snapshot) => {
+                    if (snapshot.exists()) {
+                        document.getElementById(`like-count-${post.id}`).textContent = snapshot.val().count;
+                    } else {
+                        document.getElementById(`like-count-${post.id}`).textContent = '0';
+                    }
+                });
+
+                // Fetch and display comments
+                const commentsRef = dbRef(database, 'comments/' + post.id);
+                onValue(commentsRef, (snapshot) => {
+                    const comments = snapshot.val();
+                    displayComments(comments, `comments-list-${post.id}`);
+                });
+            });
+        }
+
+        // Function to handle likes
+        
+function handleLike(postId) {
+    const likeRef = dbRef(database, 'likes/' + postId + '/count');
+    get(likeRef).then(snapshot => {
+        const currentLikes = snapshot.exists() ? snapshot.val() : 0;
+        update(likeRef, { count: currentLikes + 1 }).then(() => {
+            document.getElementById(`like-count-${postId}`).textContent = currentLikes + 1;
+        });
+    });
+}
+        // Function to handle follows
+        function handleFollow(userId, button) {
+            if (!window.currentUser) return;
+
+            const followRef = dbRef(database, `followers/${userId}/${window.currentUser.uid}`);
+            get(followRef).then((snapshot) => {
+                if (snapshot.exists()) {
+                    // Already following, unfollow
+                    set(followRef, null);
+                    button.textContent = 'Follow';
+                    button.classList.remove('following');
+                } else {
+                    // Not following, follow
+                    set(followRef, true);
+                    button.textContent = 'Following';
+                    button.classList.add('following');
+                }
+            }).catch((error) => {
+                console.error("Error handling follow:", error);
+            });
+        }
+
+        // Function to toggle comments section
+        function toggleComments(postId) {
+            const commentsSection = document.getElementById(`comments-${postId}`);
+            if (commentsSection.style.display === 'none') {
+                commentsSection.style.display = 'block';
+            } else {
+                commentsSection.style.display = 'none';
+            }
+        }
+
+        // Function to handle adding a comment
+        function handleComment(postId, commentText) {
+            if (!window.currentUser) return;
+            if (commentText.trim() === '') return;
+
+            const commentsRef = push(dbRef(database, 'comments/' + postId));
+            set(commentsRef, {
+                userId: window.currentUser.uid,
+                username: window.currentUser.username,
+                profilePic: window.currentUser.profilePic,
+                text: commentText,
+                timestamp: Date.now()
+            });
+
+            // Clear input
+            const commentsInput = commentsRef.parent.key ? document.querySelector(`#comments-${postId} input`) : null;
+            if (commentsInput) {
+                commentsInput.value = '';
+            }
+        }
+
+        // Function to display comments
+        function displayComments(comments, containerId) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = ''; // Clear existing comments
+
+            if (!comments) {
+                container.innerHTML = '<p>No comments yet.</p>';
+                return;
+            }
+
+            // Convert comments object to an array and sort by timestamp ascending
+            const commentsArray = Object.keys(comments).map(key => ({ id: key, ...comments[key] }));
+            commentsArray.sort((a, b) => a.timestamp - b.timestamp);
+
+            commentsArray.forEach(comment => {
+                const commentDiv = document.createElement('div');
+                commentDiv.classList.add('comment');
+
+                const commentProfilePic = document.createElement('img');
+                commentProfilePic.src = comment.profilePic || defaultPic;
+                commentProfilePic.alt = "Profile";
+
+                const commentText = document.createElement('div');
+                commentText.classList.add('comment-text');
+                commentText.textContent = `${comment.username}: ${comment.text}`;
+
+                commentDiv.appendChild(commentProfilePic);
+                commentDiv.appendChild(commentText);
+
+                container.appendChild(commentDiv);
+            });
+        }
+    </script>
+</body>
+</html>
